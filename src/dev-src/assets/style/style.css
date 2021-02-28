@@ -1,6 +1,5 @@
-.main-page {
-  width: 100vw;
-  height: 100vh;
+body {
+  box-sizing: border-box;
   background: linear-gradient(
     90deg,
     rgba(13, 27, 42, 1) 10%,
@@ -8,6 +7,11 @@
     rgba(22, 74, 107, 1) 70%,
     rgba(13, 27, 42, 1) 90%
   );
+}
+.main-page {
+  width: 100vw;
+  height: 100vh;
+  
 }
 
 .main-page-container {

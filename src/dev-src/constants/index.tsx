@@ -14,3 +14,8 @@ export const MAIN_PAGE_BUTTONS = [
   ["Start Game", PAGES.gameProcess],
   ["Records Table", PAGES.recordsTable],
 ];
+
+export const CELL_BORDERS = {
+  xEqualZero: ["border-bottom", "border-right", "border-left"],
+  yEqualZero: ["border-bottom", "border-right", "border-top"],
+};

@@ -5,18 +5,22 @@ import { MAIN_PAGE_BUTTONS } from "../../constants";
 import Button from "../../components/Button";
 import { useHistory } from "react-router-dom";
 
-const MainPage = () => {
-  const [userName, setUserName] = useState("");
+export type MainPageProps = {
+  history: any;
+};
 
-  const history = useHistory();
+const MainPage = ({ history }: MainPageProps) => {
+  const [userName, setUserName] = useState<string>("");
 
-  function inputChangeHandler(e) {
+  // const history = useHistory();
+
+  function inputChangeHandler(e: any) {
     const { value } = e.target;
 
-    setUserName(e.target.value);
+    setUserName(value);
   }
 
-  function buttonClickHandler(path = "") {
+  function buttonClickHandler(path: string = "") {
     history.push(path);
   }
 
