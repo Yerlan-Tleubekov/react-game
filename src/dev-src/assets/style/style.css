@@ -88,3 +88,12 @@ button {
 .w-100 {
     width: 100%;
 }
+
+.game-process-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}

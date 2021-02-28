@@ -1,48 +1,112 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../assets/style/ground.css";
-import { CELL_BORDERS } from "../constants";
+import { WINNING_CONDITIONS } from "../constants";
+import {
+  cloneDeepArray,
+  getTwoDimenArrayIndexInOneDimenArray,
+  hasOneEmptyCell,
+} from "../utils";
+import { cellBorderCreator } from "../utils/cellBorderCreator";
 
-type TicTacToeGroundProps = {
-  rows?: number;
-  cols?: number;
-};
+const INITIAL_MATRIX = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
 
-const TicTacToeGround = ({ rows = 3, cols = 3 }: TicTacToeGroundProps) => {
-  function setUniqueValues(values: Array<string>): Array<string> {
-    const uniqueValuesSet = new Set(values);
-    const uniqueValuesArray = Array.from(uniqueValuesSet);
+const TicTacToeGround = () => {
+  const [nextTurn, setNextTurn] = useState<boolean>(true);
+  const [gameMatrix, setGameMatrix] = useState<Array<Array<number | null>>>(
+    INITIAL_MATRIX
+  );
 
-    console.log(uniqueValuesArray);
+  function onCellClickHandler(x: number, y: number, count: number, event: any) {
+    const isNotEmpty = gameMatrix[x][y];
 
-    return uniqueValuesArray;
-  }
-
-  function cellBorderCreator(x: number, y: number): string {
-    let cellClassname: Array<string> = ["cell"];
-
-    if (x === 0) {
-      cellClassname.push(...CELL_BORDERS.xEqualZero);
+    if (isNotEmpty) {
+      return;
     }
 
-    if (y === 0) {
-      cellClassname.push(...CELL_BORDERS.yEqualZero);
-    }
-
-    return setUniqueValues(cellClassname).join(" ");
+    setGameMatrix((prev) => {
+      const newPrev = cloneDeepArray(prev);
+      newPrev[x][y] = nextTurn ? 1 : 2;
+      return newPrev;
+    });
+    setNextTurn((prev) => !prev);
   }
+
+  function handleResultValidation() {
+    for (let i = 0; i < WINNING_CONDITIONS.length; i++) {
+      const winCondition = WINNING_CONDITIONS[i];
+
+      const [x, y] = winCondition[0];
+      const [x1, y1] = winCondition[1];
+      const [x2, y2] = winCondition[2];
+      let a = gameMatrix[x][y];
+      let b = gameMatrix[x1][y1];
+      let c = gameMatrix[x2][y2];
+
+      if (!a || !b || !c) {
+        continue;
+      }
+
+      console.log("a, b, c, winwin", a, b, c);
+
+      if (a === b && b === c) {
+        console.log("WIN WIN WIN WIN WIN WIN WIN WIN ");
+        setGameMatrix(INITIAL_MATRIX);
+        return;
+      } else {
+        let isDraw = !hasOneEmptyCell(gameMatrix);
+        console.log("isDraw", isDraw);
+
+        if (isDraw) {
+          console.log("DRAW DRAW DRAW DRAW DRAW DRAW DRAW DRAW DRAW ");
+          setGameMatrix(INITIAL_MATRIX);
+          return;
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleResultValidation();
+  }, [gameMatrix]);
 
   return (
-    <div className="ground">
-      {Array(rows)
-        .fill(rows)
-        .map((rowField, x) =>
-          Array(cols)
-            .fill(cols)
-            .map((colField, y) => (
-              <div className={cellBorderCreator(x, y)}></div>
-            ))
-        )}
-    </div>
+    <table className="ground">
+      <tbody>
+        {gameMatrix.map((row, rowIndex, arrayRow) => (
+          <tr key={rowIndex}>
+            {row.map((col, colIndex, arrayCol) => (
+              <td
+                key={colIndex}
+                onClick={(e) => {
+                  onCellClickHandler(
+                    rowIndex,
+                    colIndex,
+                    getTwoDimenArrayIndexInOneDimenArray(
+                      rowIndex,
+                      row.length,
+                      colIndex
+                    ),
+                    e
+                  );
+                }}
+                className={cellBorderCreator(
+                  rowIndex,
+                  colIndex,
+                  arrayRow,
+                  arrayCol
+                )}
+              >
+                {col}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
