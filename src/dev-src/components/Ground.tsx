@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import "../assets/style/ground.css";
-import { WINNING_CONDITIONS } from "../constants";
+import React, { useEffect, useState } from 'react';
+import '../assets/style/ground.css';
+import { WINNING_CONDITIONS } from '../constants';
 import {
   cloneDeepArray,
   getTwoDimenArrayIndexInOneDimenArray,
   hasOneEmptyCell,
-} from "../utils";
-import { cellBorderCreator } from "../utils/cellBorderCreator";
+} from '../utils';
+import { cellBorderCreator } from '../utils/cellBorderCreator';
 
 const INITIAL_MATRIX = [
   [null, null, null],
@@ -19,6 +19,10 @@ const TicTacToeGround = () => {
   const [gameMatrix, setGameMatrix] = useState<Array<Array<number | null>>>(
     INITIAL_MATRIX
   );
+  const [roundCount, setRoundCount] = useState<number>(1);
+  const [winnerFirst, setWinnerFirst] = useState<number>(0);
+  const [winnerSecond, setWinnerSecond] = useState<number>(0);
+  const [draw, setDraw] = useState<number>(0);
 
   function onCellClickHandler(x: number, y: number, count: number, event: any) {
     const isNotEmpty = gameMatrix[x][y];
@@ -50,19 +54,22 @@ const TicTacToeGround = () => {
         continue;
       }
 
-      console.log("a, b, c, winwin", a, b, c);
-
       if (a === b && b === c) {
-        console.log("WIN WIN WIN WIN WIN WIN WIN WIN ");
         setGameMatrix(INITIAL_MATRIX);
+        setRoundCount((prev) => prev + 1);
+        if (nextTurn) {
+          setWinnerSecond((prev) => prev + 1);
+        } else {
+          setWinnerFirst((prev) => prev + 1);
+        }
         return;
       } else {
         let isDraw = !hasOneEmptyCell(gameMatrix);
-        console.log("isDraw", isDraw);
 
-        if (isDraw) {
-          console.log("DRAW DRAW DRAW DRAW DRAW DRAW DRAW DRAW DRAW ");
+        if (i === WINNING_CONDITIONS.length - 1 && isDraw) {
           setGameMatrix(INITIAL_MATRIX);
+          setRoundCount((prev) => prev + 1);
+          setDraw((prev) => prev + 1);
           return;
         }
       }
@@ -74,39 +81,48 @@ const TicTacToeGround = () => {
   }, [gameMatrix]);
 
   return (
-    <table className="ground">
-      <tbody>
-        {gameMatrix.map((row, rowIndex, arrayRow) => (
-          <tr key={rowIndex}>
-            {row.map((col, colIndex, arrayCol) => (
-              <td
-                key={colIndex}
-                onClick={(e) => {
-                  onCellClickHandler(
+    <React.Fragment>
+      <table className="ground">
+        <tbody>
+          {gameMatrix.map((row, rowIndex, arrayRow) => (
+            <tr key={rowIndex}>
+              {row.map((col, colIndex, arrayCol) => (
+                <td
+                  key={colIndex}
+                  onClick={(e) => {
+                    onCellClickHandler(
+                      rowIndex,
+                      colIndex,
+                      getTwoDimenArrayIndexInOneDimenArray(
+                        rowIndex,
+                        row.length,
+                        colIndex
+                      ),
+                      e
+                    );
+                  }}
+                  className={cellBorderCreator(
                     rowIndex,
                     colIndex,
-                    getTwoDimenArrayIndexInOneDimenArray(
-                      rowIndex,
-                      row.length,
-                      colIndex
-                    ),
-                    e
-                  );
-                }}
-                className={cellBorderCreator(
-                  rowIndex,
-                  colIndex,
-                  arrayRow,
-                  arrayCol
-                )}
-              >
-                {col}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                    arrayRow,
+                    arrayCol
+                  )}
+                >
+                  {col}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div>
+        <div>roundCount: {roundCount}</div>
+        <div>winnerFirst: {winnerFirst}</div>
+        <div>winnerSecond: {winnerSecond}</div>
+        <div>draw: {draw}</div>
+      </div>
+      
+    </React.Fragment>
   );
 };
 

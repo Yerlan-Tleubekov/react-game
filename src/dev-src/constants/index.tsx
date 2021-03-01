@@ -62,3 +62,5 @@ export const WINNING_CONDITIONS = [
     [2, 0],
   ],
 ];
+
+export const SCHOOL_URL = 'https://rs.school/js/'

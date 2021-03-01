@@ -19,9 +19,7 @@ export const getTwoDimenArrayIndexInOneDimenArray = (
 };
 
 export const hasOneEmptyCell = (array: Array<Array<number | null>>) => {
-  console.log("hasOneEmptyCell", array);
   const newArray = cloneDeepArray(array).flat();
 
-  console.log(newArray);
   return newArray.includes(null);
 };
