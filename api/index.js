@@ -1,7 +1,6 @@
 const express = require("express");
 const Joi = require("joi"); //used for validation
 const app = express();
-const gameProcess = require("./src/view/gameprocess/index");
 const router = require('./src/view/routes');
 const cors = require('cors');
 

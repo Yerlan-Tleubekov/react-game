@@ -6,13 +6,15 @@ type IconButtonProps = {
   alt?: string;
   iconClassname?: string;
   iconCntClassname?: string;
+  iconBtnClassName?: string;
   onClick?: any;
 };
 
 const IconButton = ({
   src = '',
   iconClassname = 'w-100',
-  iconCntClassname = 'icon-button p-1',
+  iconCntClassname = 'icon-button p-1 ',
+  iconBtnClassName = 'btn',
   alt = 'image',
   onClick = (): void => {},
 }: IconButtonProps) => {

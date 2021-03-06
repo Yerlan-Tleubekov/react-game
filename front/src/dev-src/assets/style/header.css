@@ -9,6 +9,7 @@
   justify-content: space-between;
   padding: 0 10%;
   box-sizing: border-box;
+  z-index: 1500;
 }
 
 .switch-theme {
@@ -18,16 +19,15 @@
 }
 
 .volume-actions-cnt {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: flex-end; */
 }
 
 .volume-actions-cnt__count {
   width: 25px;
   height: 25px;
   text-align: center;
-  color: white;
   font-size: 20px;
   font-weight: 600;
 }
