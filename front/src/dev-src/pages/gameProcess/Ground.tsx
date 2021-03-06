@@ -1,23 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import 'src/dev-src/assets/style/ground.css';
+import React, { useEffect, useState } from "react";
+import "src/dev-src/assets/style/ground.css";
 import {
   INITIAL_MATRIX,
   LOCALSTORAGE_KEYS,
   WINNING_CONDITIONS,
-} from 'src/dev-src/constants/index';
+} from "src/dev-src/constants/index";
 import {
   cloneDeepArray,
   getTwoDimenArrayIndexInOneDimenArray,
   hasOneEmptyCell,
-} from 'src/dev-src/utils/index';
-import { cellBorderCreator } from 'src/dev-src/utils/cellBorderCreator';
-import IconButton from '../../components/IconButton';
-import MultiplyIcon from 'src/dev-src/assets/images/1.1.png';
-import Nolik from 'src/dev-src/assets/images/1.2.png';
-import Ork from 'src/dev-src/assets/images/2.1.png';
-import Human from 'src/dev-src/assets/images/2.2.png';
-import Hulk from 'src/dev-src/assets/images/3.1.png';
-import Thor from 'src/dev-src/assets/images/3.2.png';
+  random,
+} from "src/dev-src/utils/index";
+import { cellBorderCreator } from "src/dev-src/utils/cellBorderCreator";
+import IconButton from "../../components/IconButton";
+import MultiplyIcon from "src/dev-src/assets/images/1.1.png";
+import Nolik from "src/dev-src/assets/images/1.2.png";
+import Ork from "src/dev-src/assets/images/2.1.png";
+import Human from "src/dev-src/assets/images/2.2.png";
+import Hulk from "src/dev-src/assets/images/3.1.png";
+import Thor from "src/dev-src/assets/images/3.2.png";
+import Statistic from "./Statistic";
+import { setRestartGame } from "src/dev-src/redux/appActions";
+import { useDispatch } from "react-redux";
+import Modal from "src/dev-src/components/Modal";
 
 interface Move {
   i: number;
@@ -30,23 +35,38 @@ const ICONS = [
   [Thor, Hulk],
 ];
 
-const TicTacToeGround = () => {
-  const activeIcons = localStorage.getItem(LOCALSTORAGE_KEYS.activeIcons) || 0;
-  // const [activeIconsIndex, setActiveIconsIndex] = useState<number>(
-  //   +activeIcons
-  // );
-  const [firstIcon, setFirstIcon] = useState<string>('');
-  const [secondIcon, setSecondIcon] = useState<string>('');
+type TicTacToeGroundType = {
+  firstIcon: string;
+  secondIcon: string;
+  playground: number;
+  restart: boolean;
+  setWinnerFirst: any;
+  setWinnerSecond: any;
+};
+
+const WINNER_F = "Winner First Player";
+const WINNER_S = "Winner Second Player";
+
+const TicTacToeGround = ({
+  firstIcon,
+  secondIcon,
+  playground,
+  restart,
+  setWinnerFirst,
+  setWinnerSecond,
+}: TicTacToeGroundType) => {
+  const dispatch = useDispatch();
 
   const [AIFight, setAIFight] = useState<boolean>(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [winner, setWinner] = useState(WINNER_F);
   const [nextTurn, setNextTurn] = useState<boolean>(true);
   const [gameMatrix, setGameMatrix] = useState<Array<Array<number | null>>>(
     INITIAL_MATRIX
   );
   const [roundCount, setRoundCount] = useState<number>(1);
-  const [winnerFirst, setWinnerFirst] = useState<number>(0);
-  const [winnerSecond, setWinnerSecond] = useState<number>(0);
+
   const [draw, setDraw] = useState<number>(0);
 
   function onCellClickHandler(x: number, y: number, count: number, event: any) {
@@ -82,10 +102,13 @@ const TicTacToeGround = () => {
       if (a === b && b === c) {
         setGameMatrix(INITIAL_MATRIX);
         setRoundCount((prev) => prev + 1);
+        setIsOpen(true);
         if (nextTurn) {
-          setWinnerSecond((prev) => prev + 1);
+          setWinnerSecond((prev: any) => prev + 1);
+          setWinner(WINNER_S);
         } else {
-          setWinnerFirst((prev) => prev + 1);
+          setWinnerFirst((prev: any) => prev + 1);
+          setWinner(WINNER_F);
         }
         setNextTurn(true);
         return;
@@ -101,12 +124,6 @@ const TicTacToeGround = () => {
         }
       }
     }
-  }
-
-  function random(array: Array<Move>): Move {
-    const rndNumber = Math.trunc(Math.random() * (array.length - 1));
-
-    return array[rndNumber];
   }
 
   function AITurn() {
@@ -139,6 +156,24 @@ const TicTacToeGround = () => {
     setNextTurn((prev) => !prev);
   }
 
+  function setBGOfPlayground(): string {
+    let className = "cell col-md-4 ";
+
+    switch (playground) {
+      case 0:
+        className += "dark";
+        break;
+
+      case 2:
+        className += "green";
+        break;
+      default:
+        break;
+    }
+
+    return className;
+  }
+
   useEffect(() => {
     if (!AIFight && !nextTurn) {
       AITurn();
@@ -146,14 +181,15 @@ const TicTacToeGround = () => {
   }, [nextTurn]);
 
   useEffect(() => {
-    handleResultValidation();
-  }, [gameMatrix]);
+    if (restart) {
+      setGameMatrix(INITIAL_MATRIX);
+      dispatch(setRestartGame(false));
+    }
+  }, [restart]);
 
   useEffect(() => {
-    const [X, O] = ICONS[+activeIcons];
-    setFirstIcon(X);
-    setSecondIcon(O);
-  }, []);
+    handleResultValidation();
+  }, [gameMatrix]);
 
   return (
     <React.Fragment>
@@ -175,12 +211,12 @@ const TicTacToeGround = () => {
                     e
                   );
                 }}
-                className="cell col-md-4"
+                className={setBGOfPlayground()}
               >
-                {col === 0 && ''}
+                {col === 0 && ""}
                 {col !== 0 && (
                   <IconButton
-                    src={col === 1 ? firstIcon || '' : secondIcon || ''}
+                    src={col === 1 ? firstIcon || "" : secondIcon || ""}
                   />
                 )}
               </button>
@@ -188,12 +224,10 @@ const TicTacToeGround = () => {
           </div>
         ))}
       </div>
-      <div>
-        <div>roundCount: {roundCount}</div>
-        <div>winnerFirst: {winnerFirst}</div>
-        <div>winnerSecond: {winnerSecond}</div>
-        <div>draw: {draw}</div>
-      </div>
+      <Statistic draw={draw} roundCount={roundCount} />
+      <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
+        <div>{winner}</div>
+      </Modal>
     </React.Fragment>
   );
 };
